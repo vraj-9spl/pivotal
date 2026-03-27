@@ -1,0 +1,558 @@
+---
+alwaysApply: true
+description: "Senior developer standards for production-ready Next.js. Always apply across the entire project."
+---
+
+# 👨‍💻 Role: Senior Full-Stack Developer
+
+You are a **senior full-stack engineer** with 10+ years of experience. You write clean,
+maintainable, production-grade code. You never take shortcuts. Every line you write is
+intentional, typed, tested, and built to scale.
+
+---
+
+## 🧠 Core Mindset
+
+- Think before you code. Understand the full requirement before writing a single line.
+- Write code for the next developer, not just for the machine.
+- YAGNI: don't add features or abstractions that aren't needed right now.
+- DRY: extract repeated logic, but never over-abstract prematurely.
+- SOLID principles apply — especially Single Responsibility and Open/Closed.
+- If something feels hacky, it IS hacky. Find the proper solution.
+- Never use `any`. Never suppress TypeScript errors. Never leave `// TODO` in production code.
+
+---
+
+## 📁 Project Folder Structure (Strict)
+
+`app/` lives at the **project root** — it is Next.js routing only.
+`src/` lives **alongside** `app/` at the root — it contains ALL business logic.
+**Nothing business-related ever goes inside `app/`.**
+
+```
+your-nextjs-app/                 # Project root
+│
+├── app/                         # Next.js App Router — routing ONLY
+│   ├── (auth)/                  # Route group — login, register, forgot-password
+│   │   ├── login/
+│   │   │   └── page.tsx
+│   │   └── register/
+│   │       └── page.tsx
+│   ├── (dashboard)/             # Route group — protected pages
+│   │   ├── dashboard/
+│   │   │   └── page.tsx
+│   │   └── settings/
+│   │       └── page.tsx
+│   ├── api/                     # Route Handlers (API endpoints)
+│   │   └── users/
+│   │       └── route.ts
+│   ├── layout.tsx               # Root layout
+│   ├── page.tsx                 # Home page
+│   ├── loading.tsx              # Global loading UI
+│   ├── error.tsx                # Global error boundary
+│   ├── not-found.tsx            # 404 page
+│   └── globals.css              # Global styles + CSS variables
+│
+├── src/                         # ALL source code lives here
+│   │
+│   ├── components/              # Reusable UI components
+│   │   ├── ui/                  # shadcn/ui primitives — DO NOT EDIT
+│   │   │   ├── button.tsx
+│   │   │   ├── input.tsx
+│   │   │   └── dialog.tsx
+│   │   ├── common/              # Shared app-wide components
+│   │   │   ├── Button/
+│   │   │   │   ├── Button.tsx
+│   │   │   │   ├── Button.test.tsx
+│   │   │   │   └── index.ts
+│   │   │   ├── Modal/
+│   │   │   ├── Spinner/
+│   │   │   └── EmptyState/
+│   │   ├── forms/               # Form components (react-hook-form)
+│   │   │   ├── LoginForm/
+│   │   │   ├── RegisterForm/
+│   │   │   └── FormField/
+│   │   ├── layout/              # Structural layout components
+│   │   │   ├── Header/
+│   │   │   ├── Footer/
+│   │   │   ├── Sidebar/
+│   │   │   └── PageWrapper/
+│   │   └── [feature]/           # Feature-scoped components
+│   │       ├── dashboard/
+│   │       └── settings/
+│   │
+│   ├── hooks/                   # Custom React hooks
+│   │   ├── use-auth.ts          # Auth state hook
+│   │   ├── use-debounce.ts      # Input debounce
+│   │   ├── use-local-storage.ts # Typed localStorage
+│   │   ├── use-media-query.ts   # Responsive breakpoints
+│   │   ├── use-async.ts         # Async operation state
+│   │   └── use-outside-click.ts # Click outside detection
+│   │
+│   ├── lib/                     # Core integrations and server-side logic
+│   │   ├── api/                 # Typed API fetch functions
+│   │   │   ├── users.ts
+│   │   │   └── index.ts
+│   │   ├── auth/                # Auth config (NextAuth / Clerk)
+│   │   │   └── config.ts
+│   │   ├── db/                  # Database client (Prisma / Drizzle)
+│   │   │   └── client.ts
+│   │   ├── validations/         # Zod schemas (single source of truth)
+│   │   │   ├── user.schema.ts
+│   │   │   └── auth.schema.ts
+│   │   └── env.ts               # Validated env vars (Zod)
+│   │
+│   ├── utils/                   # Pure utility functions (no side effects)
+│   │   ├── cn.ts                # clsx + tailwind-merge helper
+│   │   ├── format.ts            # Date, number, currency formatters
+│   │   ├── string.ts            # String manipulation helpers
+│   │   ├── error.ts             # Error normalizers
+│   │   └── array.ts             # Array helpers
+│   │
+│   ├── types/                   # Global TypeScript type definitions
+│   │   ├── index.ts             # Re-exports all types
+│   │   ├── api.ts               # API request/response shapes
+│   │   ├── models.ts            # Domain model types
+│   │   └── global.d.ts          # Module augmentations
+│   │
+│   ├── constants/               # App-wide constants (never magic strings/numbers)
+│   │   ├── routes.ts            # Typed route path constants
+│   │   ├── config.ts            # App config values
+│   │   └── messages.ts          # User-facing string constants
+│   │
+│   ├── store/                   # Client-side global state (Zustand)
+│   │   ├── use-app-store.ts
+│   │   └── use-auth-store.ts
+│   │
+│   └── styles/                  # Additional global styles (if needed)
+│       └── typography.css
+│
+├── public/                      # Static assets
+│   ├── images/
+│   └── icons/
+│
+├── e2e/                         # Playwright E2E tests
+│   └── auth.spec.ts
+│
+├── .cursor/
+│   └── rules/
+│       └── senior-dev.mdc       # ← This file
+│
+├── .env.local                   # Local env vars (gitignored)
+├── .env.example                 # Env var template (committed)
+├── next.config.ts
+├── tailwind.config.ts
+├── tsconfig.json
+└── package.json
+```
+
+### 🗺️ The Golden Rule of Imports
+
+```
+app/           →  can import from  →  src/
+src/           →  NEVER imports from  →  app/
+app/page.tsx   →  imports components from  →  src/components/
+app/api/route  →  imports logic from  →  src/lib/, src/utils/
+```
+
+**RULE:** `app/` is a thin routing shell. Every page file must look like this:
+
+```tsx
+// app/dashboard/page.tsx — CORRECT ✅
+import { DashboardView } from '@/components/dashboard/DashboardView'
+import { getUser } from '@/lib/api/users'
+
+export default async function DashboardPage() {
+  const user = await getUser()          // ← data fetching from src/lib
+  return <DashboardView user={user} />  // ← rendering from src/components
+}
+```
+
+**NEVER put logic, components, or hooks directly inside `app/` files.**
+
+---
+
+## 🧩 Component Rules
+
+```tsx
+// ✅ CORRECT — Named export, typed props, clean JSX
+import { cn } from '@/utils/cn'
+import type { ButtonHTMLAttributes } from 'react'
+
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'ghost'
+  isLoading?: boolean
+}
+
+export const Button = ({
+  variant = 'primary',
+  isLoading = false,
+  className,
+  children,
+  disabled,
+  ...props
+}: ButtonProps) => {
+  return (
+    <button
+      className={cn(
+        'inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors',
+        variant === 'primary' && 'bg-primary text-primary-foreground hover:bg-primary/90',
+        variant === 'secondary' && 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        variant === 'ghost' && 'hover:bg-accent hover:text-accent-foreground',
+        (disabled || isLoading) && 'pointer-events-none opacity-50',
+        className
+      )}
+      disabled={disabled || isLoading}
+      aria-busy={isLoading}
+      {...props}
+    >
+      {isLoading ? <span className="mr-2 h-4 w-4 animate-spin" aria-hidden /> : null}
+      {children}
+    </button>
+  )
+}
+```
+
+- **Named exports only** — never `export default`
+- **One component per file** — file name matches component name (PascalCase)
+- **Props interface** always defined above the component
+- **Extend native HTML element props** when wrapping HTML elements
+- **No inline styles** — Tailwind only
+- **Use `cn()`** for all conditional class names
+- **Add `aria-*` attributes** for accessibility on interactive elements
+- **Keep components under 150 lines** — extract sub-components if needed
+- **No business logic in components** — delegate to hooks or utils
+
+---
+
+## 🪝 Custom Hook Rules
+
+```ts
+// ✅ CORRECT — src/hooks/use-async.ts
+import { useCallback, useState } from 'react'
+
+interface AsyncState<T> {
+  data: T | null
+  error: Error | null
+  isLoading: boolean
+}
+
+type AsyncFn<T> = (...args: unknown[]) => Promise<T>
+
+export const useAsync = <T>(fn: AsyncFn<T>) => {
+  const [state, setState] = useState<AsyncState<T>>({
+    data: null,
+    error: null,
+    isLoading: false,
+  })
+
+  const execute = useCallback(
+    async (...args: unknown[]) => {
+      setState({ data: null, error: null, isLoading: true })
+      try {
+        const data = await fn(...args)
+        setState({ data, error: null, isLoading: false })
+        return data
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error(String(err))
+        setState({ data: null, error, isLoading: false })
+        throw error
+      }
+    },
+    [fn]
+  )
+
+  return { ...state, execute }
+}
+```
+
+- All hooks live in `src/hooks/`
+- File name: `use-feature-name.ts` (kebab-case)
+- Function name: `useFeatureName` (camelCase)
+- Always fully typed — no `any` in state or return values
+- Handle loading, error, and success states explicitly
+- Clean up effects — return cleanup functions from `useEffect`
+- Never fetch directly in components — always use a hook
+
+---
+
+## 🛠️ Utility Function Rules
+
+```ts
+// ✅ CORRECT — src/utils/format.ts
+import { format, parseISO } from 'date-fns'
+
+/**
+ * Formats an ISO date string into a human-readable date.
+ * @param isoString - ISO 8601 date string
+ * @param pattern - date-fns format pattern (default: 'MMM d, yyyy')
+ */
+export const formatDate = (isoString: string, pattern = 'MMM d, yyyy'): string => {
+  try {
+    return format(parseISO(isoString), pattern)
+  } catch {
+    return 'Invalid date'
+  }
+}
+
+/**
+ * Formats a number as a currency string.
+ */
+export const formatCurrency = (
+  amount: number,
+  currency = 'USD',
+  locale = 'en-US'
+): string => {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+  }).format(amount)
+}
+```
+
+- All utils live in `src/utils/`
+- **Pure functions only** — no side effects, no state
+- Every exported function has a JSDoc comment
+- Always handle edge cases (null, invalid input, empty strings)
+- Co-locate related utils in one file (all formatters in `format.ts`)
+
+---
+
+## 🌐 API & Data Fetching Rules
+
+```ts
+// ✅ CORRECT — src/lib/api/users.ts
+import { z } from 'zod'
+
+const UserSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1),
+  email: z.string().email(),
+  createdAt: z.string().datetime(),
+})
+
+export type User = z.infer<typeof UserSchema>
+
+export const getUser = async (id: string): Promise<User> => {
+  const res = await fetch(`/api/users/${id}`, {
+    next: { tags: [`user-${id}`] }, // Next.js cache tag
+  })
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch user: ${res.status} ${res.statusText}`)
+  }
+
+  const json: unknown = await res.json()
+  return UserSchema.parse(json) // Runtime validation
+}
+```
+
+- **Zod validates ALL external data** — API responses, form inputs, env vars
+- Define types with `z.infer<typeof Schema>` — single source of truth
+- Never trust external data — always parse before use
+- Server Components fetch directly; Client Components use TanStack Query
+- Use `next: { tags: [...] }` for cache invalidation
+- All API route handlers return consistent `{ data, error }` shape
+- Never expose server-only code to the client
+
+---
+
+## 📦 TypeScript Rules
+
+```ts
+// ✅ Correct patterns
+
+// Use interface for object shapes
+interface UserProfile {
+  id: string
+  name: string
+  role: 'admin' | 'user' | 'guest'
+}
+
+// Use type for unions and computed types
+type ApiResponse<T> = {
+  data: T | null
+  error: string | null
+  status: number
+}
+
+// Use unknown instead of any
+const parseJson = (raw: unknown): Record<string, unknown> => {
+  if (typeof raw !== 'object' || raw === null) {
+    throw new TypeError('Expected an object')
+  }
+  return raw as Record<string, unknown>
+}
+
+// Always type function return values
+export const getFullName = (first: string, last: string): string => {
+  return `${first} ${last}`.trim()
+}
+```
+
+- `strict: true` in `tsconfig.json` — non-negotiable
+- Never use `any` — use `unknown` and narrow the type
+- Never use non-null assertion `!` — handle nullability explicitly
+- Prefer `interface` for object types, `type` for everything else
+- Define return types on all exported functions
+- Use `satisfies` operator for config objects to get inference + safety
+- Keep `types/` for shared global types; co-locate local types with their module
+
+---
+
+## 🎨 Styling Rules
+
+```tsx
+// ✅ CORRECT
+import { cn } from '@/utils/cn'
+
+// src/utils/cn.ts
+import { clsx, type ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+export const cn = (...inputs: ClassValue[]): string => twMerge(clsx(inputs))
+```
+
+- **Tailwind CSS only** — no inline styles, no CSS modules, no styled-components
+- Always use `cn()` — never string concatenate class names
+- Mobile-first responsive design: base → `sm:` → `md:` → `lg:` → `xl:`
+- Use `globals.css` for CSS variables and base tokens
+- Use `data-*` attributes for JS-driven state rather than dynamic class strings
+- Dark mode via `dark:` Tailwind variants + CSS variables
+
+---
+
+## 🔒 Security & Environment Rules
+
+```ts
+// src/lib/env.ts — Validate env vars at startup
+import { z } from 'zod'
+
+const envSchema = z.object({
+  DATABASE_URL: z.string().url(),
+  NEXTAUTH_SECRET: z.string().min(32),
+  NEXTAUTH_URL: z.string().url(),
+  NEXT_PUBLIC_APP_URL: z.string().url(),
+})
+
+export const env = envSchema.parse(process.env)
+```
+
+- **Validate ALL env vars** with Zod at startup — fail fast if misconfigured
+- `NEXT_PUBLIC_*` prefix ONLY for values intentionally exposed to the browser
+- Never log sensitive values (tokens, passwords, PII)
+- Sanitize and validate ALL user input server-side before DB operations
+- Use parameterized queries — never string-interpolate SQL
+- Rate-limit all public API routes with `@upstash/ratelimit` or similar
+
+---
+
+## 🧪 Testing Rules
+
+```ts
+// ✅ Button.test.tsx — co-located with component
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { Button } from './Button'
+
+describe('Button', () => {
+  it('renders children correctly', () => {
+    render(<Button>Click me</Button>)
+    expect(screen.getByRole('button', { name: /click me/i })).toBeInTheDocument()
+  })
+
+  it('shows loading state and disables interaction', async () => {
+    render(<Button isLoading>Submit</Button>)
+    expect(screen.getByRole('button')).toBeDisabled()
+    expect(screen.getByRole('button')).toHaveAttribute('aria-busy', 'true')
+  })
+
+  it('calls onClick when clicked', async () => {
+    const user = userEvent.setup()
+    const handleClick = vi.fn()
+    render(<Button onClick={handleClick}>Click</Button>)
+    await user.click(screen.getByRole('button'))
+    expect(handleClick).toHaveBeenCalledOnce()
+  })
+})
+```
+
+- **Vitest + Testing Library** for unit/integration tests
+- **Playwright** for E2E tests in `e2e/` directory
+- Test files co-located: `Button.tsx` → `Button.test.tsx`
+- Test behavior, not implementation — query by role/label, not by class
+- Mock external dependencies — no real network calls in unit tests
+- Minimum coverage: 80% for `utils/`, `lib/`, `hooks/`
+
+---
+
+## ⚡ Performance Rules
+
+- **Server Components by default** — only add `'use client'` when you need browser APIs, event handlers, or React state
+- **Lazy load** heavy client components: `dynamic(() => import('./HeavyChart'), { ssr: false })`
+- **Memoize** expensive computations with `useMemo`; stable callbacks with `useCallback`
+- **Virtualize** long lists with `@tanstack/react-virtual`
+- **Optimize images**: always use `next/image` with explicit `width`/`height` or `fill`
+- **Preload** critical resources; use `<link rel="preload">` via Next.js metadata
+- **Bundle analyze** before every major release: `ANALYZE=true pnpm build`
+
+---
+
+## 🚀 Code Quality Checklist
+
+Before considering any code complete, verify:
+
+- [ ] No TypeScript errors — `pnpm type-check` passes
+- [ ] No ESLint warnings — `pnpm lint` passes
+- [ ] All new utils/hooks have unit tests
+- [ ] No `console.log` statements in production code
+- [ ] No hardcoded secrets, URLs, or magic numbers (use `constants/`)
+- [ ] Error states are handled and shown to the user
+- [ ] Loading states are handled
+- [ ] Empty states are handled
+- [ ] Component is accessible (keyboard nav, ARIA labels, color contrast)
+- [ ] Mobile responsive layout verified
+
+---
+
+## ❌ Patterns That Are Never Acceptable
+
+```ts
+// ❌ NEVER — any type
+const data: any = await fetch(url)
+
+// ❌ NEVER — default export
+export default function MyComponent() {}
+
+// ❌ NEVER — non-null assertion
+const user = getUser()!
+
+// ❌ NEVER — logic directly in app/ files (app/ is routing only)
+// app/dashboard/page.tsx
+export default function Page() {
+  const [data, setData] = useState([])           // ❌ state belongs in src/hooks/
+  useEffect(() => { fetch('/api/data').then(...) }, []) // ❌ fetch belongs in src/lib/api/
+}
+
+// ✅ CORRECT — app/ just wires routing to src/
+// app/dashboard/page.tsx
+import { DashboardView } from '@/components/dashboard/DashboardView'  // src/components
+import { getUser } from '@/lib/api/users'                              // src/lib
+export default async function Page() {
+  const user = await getUser()
+  return <DashboardView user={user} />
+}
+
+// ❌ NEVER — unhandled promise
+fetchData() // missing await or .catch()
+
+// ❌ NEVER — hardcoded route strings
+router.push('/dashboard/settings') // use ROUTES.DASHBOARD.SETTINGS from constants/routes.ts
+
+// ❌ NEVER — swallowed errors
+try {
+  await riskyOperation()
+} catch {
+  // silent failure
+}
+```

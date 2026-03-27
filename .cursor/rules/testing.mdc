@@ -1,0 +1,15 @@
+---
+description: "Testing conventions. Apply when writing test files."
+globs:
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - "**/*.spec.ts"
+alwaysApply: false
+---
+
+# Testing Rules
+- Use Vitest for unit tests, Playwright for E2E
+- Test file lives next to the source file: `Button.tsx` → `Button.test.tsx`
+- Name tests descriptively: `it('renders error state when API fails')`
+- Mock external dependencies — never make real network calls in unit tests
+- Aim for behavior testing, not implementation testing

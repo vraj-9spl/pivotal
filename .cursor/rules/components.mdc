@@ -1,0 +1,16 @@
+---
+description: "React component patterns. Apply when creating components or hooks."
+globs:
+  - "src/components/**"
+  - "src/hooks/**"
+alwaysApply: false
+---
+
+# Component Rules
+- Prefer `const` arrow functions: `const MyComponent = () => {}`
+- Named exports only
+- Co-locate component-specific types in the same file
+- Custom hooks go in `src/hooks/` and must start with `use`
+- Avoid prop drilling — use Context or Zustand for deeply shared state
+- Keep components pure where possible; side effects belong in hooks
+- Use shadcn/ui primitives — never modify files in `components/ui/` directly

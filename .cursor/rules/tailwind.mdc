@@ -1,0 +1,14 @@
+---
+description: "Styling rules. Apply when modifying component styles."
+globs:
+  - "src/components/**"
+  - "src/app/**"
+alwaysApply: false
+---
+
+# Styling Rules
+- Tailwind CSS only — no inline styles, no CSS-in-JS
+- Use `cn()` utility (clsx + tailwind-merge) for conditional class names
+- Responsive design is mobile-first: start with base, add `md:` / `lg:` breakpoints
+- Use CSS variables for theme tokens defined in `globals.css`
+- Never hardcode colors — use Tailwind's design tokens

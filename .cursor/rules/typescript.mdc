@@ -1,0 +1,16 @@
+---
+description: "TypeScript patterns. Apply when creating or editing .ts/.tsx files."
+globs:
+  - "**/*.ts"
+  - "**/*.tsx"
+alwaysApply: false
+---
+
+# TypeScript Rules
+- Strict mode is enabled — honor all strict checks
+- Prefer `interface` over `type` for object shapes
+- Use `type` for unions, intersections, and primitives
+- Never use non-null assertion (`!`) — handle nullability explicitly
+- Use `unknown` instead of `any`; narrow the type before use
+- Define return types on all exported functions
+- Use Zod for runtime validation of external data (API responses, form input)

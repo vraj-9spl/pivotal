@@ -1,0 +1,17 @@
+---
+description: "API routes and data fetching. Apply when working in app/api/ or lib/."
+globs:
+  - "src/app/api/**"
+  - "src/lib/**"
+  - "src/server/**"
+alwaysApply: false
+---
+
+# API & Data Fetching
+- Validate all incoming request bodies with Zod before processing
+- Return consistent JSON shapes: `{ data, error, status }`
+- Use Server Actions for form mutations — not client-side fetch calls
+- Use TanStack Query for client-side data fetching and caching
+- Never expose sensitive env vars to the client (prefix with NEXT_PUBLIC_ only intentionally)
+- Rate-limit all public API routes
+- Always handle and log errors — never swallow them silently

@@ -1,0 +1,12 @@
+---
+alwaysApply: true
+description: "Core project conventions for this Next.js app"
+---
+
+# Core Conventions
+- TypeScript strict mode — never use `any`, use `unknown` or define a type
+- Named exports only — never default exports
+- All async functions must use try/catch with proper error handling
+- Use `bun` as the package manager
+- Keep files under 200 lines; split when they grow larger
+- Write self-documenting code; add comments only for "why", not "what"

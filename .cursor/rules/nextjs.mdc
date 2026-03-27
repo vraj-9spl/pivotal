@@ -1,0 +1,16 @@
+---
+description: "Next.js App Router patterns. Apply when working in app/ directory."
+globs:
+  - "src/app/**"
+alwaysApply: false
+---
+
+# Next.js App Router
+- App Router only — never suggest Pages Router patterns
+- Use Server Components by default; only add `'use client'` when truly needed
+- Use `layout.tsx` for shared layouts, `loading.tsx` for loading states, `error.tsx` for error boundaries
+- Use Route Handlers (`route.ts`) for API endpoints
+- Always add proper `metadata` exports for SEO
+- Use `next/image` for all images — never raw `<img>` tags
+- Use `next/link` for all internal navigation
+- Prefer `generateStaticParams` for static generation where possible
